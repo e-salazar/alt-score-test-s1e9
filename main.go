@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"math"
 	"net/http"
 	"strconv"
 )
@@ -44,6 +43,7 @@ func main() {
 	http.ListenAndServe(":8080", nil)
 }
 
+// Endpoint /phase-change-diagram
 func phaseChangeDiagramHandler(httpResponse http.ResponseWriter, httpRequest *http.Request) {
 	if httpRequest.Method != http.MethodGet {
 		http.Error(httpResponse, "Método no permitido", http.StatusMethodNotAllowed)
@@ -75,8 +75,8 @@ func phaseChangeDiagramHandler(httpResponse http.ResponseWriter, httpRequest *ht
 	}
 
 	response := PhaseChangeDiagramResponse{
-		SpecificVolumeLiquid: truncateTo5Decimals(liquidVolume),
-		SpecificVolumeVapor:  truncateTo5Decimals(vaporVolume),
+		SpecificVolumeLiquid: liquidVolume,
+		SpecificVolumeVapor:  vaporVolume,
 	}
 	httpResponse.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(httpResponse).Encode(response)
@@ -98,9 +98,4 @@ func calculateVaporVolume(pressure float64) (float64, error) {
 		return 0, fmt.Errorf("pendiente m_vapor no puede ser cero")
 	}
 	return (pressure - b_vapor) / m_vapor, nil
-}
-
-func truncateTo5Decimals(num float64) float64 {
-	truncated := math.Floor(num*100000) / 100000
-	return truncated
 }
